@@ -22,7 +22,7 @@ services:
             timeout: 5s
             retries: 5
     finance:
-        image: luanvn4/integracao-finance:2.0.0
+        image: luanvn4/integracao-finance:5.0.0
         env_file:
             - .env.finance
         ports:
@@ -30,5 +30,12 @@ services:
         depends_on:
             - postgres
             - rabbitmq
-        healthcheck:
-            test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+    appointments:
+        image: holyvieri/consultas:44b0f0e-dev
+        env_file:
+            - .env.appointments
+        ports:
+            - "8081:8080"
+        depends_on:
+            - postgres
+            - rabbitmq
