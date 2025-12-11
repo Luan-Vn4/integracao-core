@@ -1,34 +1,51 @@
 services:
-    postgres:
-        image: postgres:17
-        env_file:
-            - .env.postgres
-        ports:
-            - "5432:5432"
-        volumes:
-            - ./docker-volumes/postgres:/var/lib/postgresql/data
-    rabbitmq:
-        image: rabbitmq:4.2.1-management
-        env_file:
-            - .env.rabbitmq
-        ports:
-            - "5672:5672"
-            - "15672:15672"
-        volumes:
-            - ./docker-volumes/rabbitmq:/var/lib/rabbitmq
-        healthcheck:
-            test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
-            interval: 10s
-            timeout: 5s
-            retries: 5
-    finance:
-        image: luanvn4/integracao-finance:2.0.0
-        env_file:
-            - .env.finance
-        ports:
-            - "8080:8080"
-        depends_on:
-            - postgres
-            - rabbitmq
-        healthcheck:
-            test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+  postgres:
+    image: postgres:17
+    env_file:
+      - .env.postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker-volumes/postgres:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:4.2.1-management
+    env_file:
+      - .env.rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./docker-volumes/rabbitmq:/var/lib/rabbitmq
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  finance:
+    image: luanvn4/integracao-finance:2.0.0
+    env_file:
+      - .env.finance
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - rabbitmq
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
+
+  estoque:
+    image: rian011/intsis-estoque:1.0.0
+    env_file:
+      - .env.estoque
+    ports:
+      - "8081:8080"
+    depends_on:
+      - postgres
+      - rabbitmq
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
